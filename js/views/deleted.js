@@ -3,7 +3,7 @@ define(
 
 function($, _, Backbone, tpl) {
 
-	DeletedView = Backbone.View.extend({
+	var DeletedView = Backbone.View.extend({
 
 		initialize: function() {
 			this.template = _.template(tpl.get('deleted'));

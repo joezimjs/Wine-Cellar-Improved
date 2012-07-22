@@ -3,7 +3,7 @@ define(
 
 function($, _, Backbone, tpl) {
 
-    HeaderView = Backbone.View.extend({
+    var HeaderView = Backbone.View.extend({
 
         initialize: function() {
             this.template = _.template(tpl.get('header'));
@@ -21,6 +21,19 @@ function($, _, Backbone, tpl) {
         newWine: function(event) {
             app.navigate("wines/new", true);
             return false;
+        },
+
+        addStatus: function(view) {
+            var el = view.render();
+            this.$el.parent().append(el);
+
+            var removeStatus = function(){
+                $(el).fadeOut('slow', function() {
+                    view.close();
+                });
+            };
+
+            setTimeout(removeStatus, 5000);
         }
 
     });

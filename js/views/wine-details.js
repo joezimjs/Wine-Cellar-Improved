@@ -1,9 +1,9 @@
 define(
-['jquery', 'lodash', 'backbone', 'utils/tpl'],
+['jquery', 'lodash', 'backbone', 'utils/tpl', 'models/status', 'views/status'],
 
-function($, _, Backbone, tpl) {
+function($, _, Backbone, tpl, Status, StatusView) {
 
-    WineView = Backbone.View.extend({
+    var WineView = Backbone.View.extend({
 
         initialize: function() {
             this.template = _.template(tpl.get('wine-details'));
@@ -25,6 +25,8 @@ function($, _, Backbone, tpl) {
         },
 
         saveWine: function() {
+            var self = this;
+
             this.model.set({
                 name: $('#name').val(),
                 grapes: $('#grapes').val(),
@@ -36,7 +38,8 @@ function($, _, Backbone, tpl) {
             if (this.model.isNew()) {
                 app.wineList.create(this.model, {
                     success: function() {
-                        app.navigate('wines/saved', true);
+                        self.sendStatus('success', 'saved');
+                        app.navigate('wines/' + self.model.id , true);
                     }
                 });
             } else {
@@ -45,7 +48,7 @@ function($, _, Backbone, tpl) {
                     // Strange error: If you call save on a model that has no changes,
                     // then this success handler will not be called.
                     success: function() {
-                        app.navigate('wines/saved', true);
+                        self.sendStatus('success', 'saved');
                     }
                 });
 
@@ -55,12 +58,19 @@ function($, _, Backbone, tpl) {
         },
 
         deleteWine: function() {
+            var self = this;
             this.model.destroy({
                 success: function() {
-                    app.navigate('wines/deleted', true);
+                    self.sendStatus('success', 'deleted');
+                    app.navigate('', true);
                 }
             });
             return false;
+        },
+
+        sendStatus: function(type, op) {
+            var status = new Status({type:type, operation:op});
+            app.header.addStatus(new StatusView({model:status}));
         }
 
     });

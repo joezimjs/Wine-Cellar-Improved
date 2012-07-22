@@ -7,6 +7,16 @@
     padding-top: 5px;
 }
 
+#header div {
+    float:left;
+    vertical-align: middle;
+    width:300px;
+}
+
+#header div.status-container {
+    width:500px;
+}
+
 #sidebar {
     position: absolute;
     left: 10px;
@@ -36,6 +46,16 @@
 .title {
     font-size: 20px;
     font-weight: bold;
+}
+
+#header .status{
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid #090;
+    background: #0f0;
+    margin: 0;
+    padding: 10px;
+    vertical-align: middle;
 }
 
 ul {

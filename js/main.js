@@ -10,13 +10,13 @@ require([
     'views/wine-list',
     'utils/tpl',
     'models/wine-model',
-    'models/wine-collection'
+    'models/wine-collection',
+    'models/status'
 ],
 
-function($, _, Backbone, HeaderView, StartView, DeletedView, StatusView, WineView, WineListView, tpl, Wine, WineCollection) {
+function($, _, Backbone, HeaderView, StartView, DeletedView, StatusView, WineView, WineListView, tpl, Wine, WineCollection, Status) {
 
     Backbone.View.prototype.close = function() {
-        //console.log('Closing view ' + this);
         if (this.beforeClose) {
             this.beforeClose();
         }
@@ -27,51 +27,42 @@ function($, _, Backbone, HeaderView, StartView, DeletedView, StatusView, WineVie
     var AppRouter = Backbone.Router.extend({
 
         initialize: function() {
-            $('#header').html(new HeaderView().render());
-            this.initWineList();
+            this.header = new HeaderView();
+            $('#header').html(this.header.render());
+            //$('#header').append(new StatusView({model:new Status()}).render());
         },
 
         routes: {
             "": "list",
             "wines/new": "newWine",
-            "wines/deleted": "deleted",
-            "wines/saved": "saved",
             "wines/:id": "wineDetails"
         },
 
         list: function() {
-            this.showView('#content', new StartView());
+            this.initWineList(function() {
+                this.showView('#content', new StartView());
+            });
         },
 
         wineDetails: function(id) {
-            var wine = this.wineList.get(id);
-
-            if (wine) { // If the wine with that ID exists
-                this.showView('#content', new WineView({
-                    model: wine
-                }));
-            } else { // Couldn't find a wine with that ID
-                this.showView('#content', new DeletedView());
-            }
+            this.initWineList(function() {
+                var wine = this.wineList.get(id);
+                if (wine) { // If the wine with that ID exists
+                    this.showView('#content', new WineView({
+                        model: wine
+                    }));
+                } else { // Couldn't find a wine with that ID
+                    this.showView('#content', new DeletedView());
+                }
+            });
         },
 
         newWine: function() {
-            this.showView('#content', new WineView({
-                model: new Wine()
-            }));
-        },
-
-        deleted: function() {
-            this.showStatus('deleted');
-        },
-
-        saved: function() {
-            this.showStatus('saved');
-        },
-
-        showStatus: function(status) {
-            var model = new Backbone.Model({message:status});
-            this.showView('#content', new StatusView({model: model}));
+            this.initWineList(function() {
+                this.showView('#content', new WineView({
+                    model: new Wine()
+                }));
+            });
         },
 
         showView: function(selector, view) {
@@ -83,17 +74,25 @@ function($, _, Backbone, HeaderView, StartView, DeletedView, StatusView, WineVie
             return view;
         },
 
-        initWineList: function(callback) {
-            this.wineList = new WineCollection();
-            this.wineList.fetch({
-                success: function() {
-                    var winelist = new WineListView({
-                        model: app.wineList
-                    });
+        initWineList: function(callback, ctx) {
+            ctx = ctx || this;
 
-                    $('#sidebar').html(winelist.render());
-                }
-            });
+            if (this.wineList) {
+                callback.call(ctx);
+            } else {
+                this.wineList = new WineCollection();
+                this.wineList.fetch({
+                    success: function() {
+                        var winelist = new WineListView({
+                            model: app.wineList
+                        });
+
+                        $('#sidebar').html(winelist.render());
+
+                        callback.call(ctx);
+                    }
+                });
+            }
         }
 
     });

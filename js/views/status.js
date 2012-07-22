@@ -3,7 +3,9 @@ define(
 
 function($, _, Backbone, tpl) {
 
-	StatusView = Backbone.View.extend({
+	var StatusView = Backbone.View.extend({
+
+		el: '<div class="status-container"></div>',
 
 		initialize: function() {
 			this.template = _.template(tpl.get('status'));

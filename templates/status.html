@@ -1,2 +1,1 @@
-<h2>Success!</h2>
-<p>The wine has been <%= message %> successfully.</p>
+<p class="<%= type %> status">The wine has <% if (type !== "success") { %>not <% } %>been <%= operation %> successfully.</p>
