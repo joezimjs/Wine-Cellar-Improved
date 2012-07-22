@@ -44,9 +44,7 @@ function($, _, Backbone, tpl, Status, StatusView) {
                 });
             } else {
 
-                this.model.save({
-                    // Strange error: If you call save on a model that has no changes,
-                    // then this success handler will not be called.
+                this.model.save(null, {
                     success: function() {
                         self.sendStatus('success', 'saved');
                     }
